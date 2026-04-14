@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { createListing, uploadListingPhotos } from "../lib/listings";
+import { createListing, deleteListingWithAssets, uploadListingPhotos } from "../lib/listings";
 
 export default function CreateListingPage() {
   const { user } = useAuth();
@@ -52,6 +52,7 @@ export default function CreateListingPage() {
     });
 
     if (uploadResult.error) {
+      await deleteListingWithAssets(createResult.id, user.id);
       setError(uploadResult.error);
       setIsSubmitting(false);
       return;

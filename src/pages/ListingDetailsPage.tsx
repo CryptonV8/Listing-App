@@ -24,9 +24,9 @@ export default function ListingDetailsPage() {
 
     let ignore = false;
 
-    async function load() {
+    async function load(targetId: string) {
       setIsLoading(true);
-      const result = await fetchListingDetails(listingId);
+      const result = await fetchListingDetails(targetId);
       if (ignore) {
         return;
       }
@@ -37,7 +37,7 @@ export default function ListingDetailsPage() {
       setActiveIndex(0);
     }
 
-    void load();
+    void load(listingId);
 
     return () => {
       ignore = true;

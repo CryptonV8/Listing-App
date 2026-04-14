@@ -24,9 +24,9 @@ export default function ConfirmDeletePage() {
 
     let ignore = false;
 
-    async function loadListing() {
+    async function loadListing(targetId: string) {
       setIsLoading(true);
-      const result = await fetchListingDetails(listingId);
+      const result = await fetchListingDetails(targetId);
       if (ignore) {
         return;
       }
@@ -43,7 +43,7 @@ export default function ConfirmDeletePage() {
       setIsLoading(false);
     }
 
-    void loadListing();
+    void loadListing(listingId);
 
     return () => {
       ignore = true;

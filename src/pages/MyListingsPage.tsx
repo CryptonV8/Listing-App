@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import ListingCard from "../components/listings/ListingCard";
 import { useAuth } from "../context/AuthContext";
 import { fetchListingsPage } from "../lib/listings";
@@ -15,25 +15,27 @@ export default function MyListingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const currentUser = user;
+
   const pageCount = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
 
   useEffect(() => {
-    const currentUser = user;
-
     if (!currentUser) {
       setIsLoading(false);
       return;
     }
 
+    const ownerId = currentUser.id;
+
     let ignore = false;
 
-    async function loadListings() {
+    async function loadListings(targetOwnerId: string) {
       setIsLoading(true);
       const result = await fetchListingsPage({
         page: currentPage,
         pageSize: PAGE_SIZE,
-        ownerId: currentUser.id,
+        ownerId: targetOwnerId,
       });
 
       if (ignore) {
@@ -46,12 +48,16 @@ export default function MyListingsPage() {
       setIsLoading(false);
     }
 
-    void loadListings();
+    void loadListings(ownerId);
 
     return () => {
       ignore = true;
     };
-  }, [currentPage, user]);
+  }, [currentPage, currentUser]);
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <section className="space-y-4">
