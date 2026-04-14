@@ -1,21 +1,18 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const hasSupabaseEnv = Boolean(supabaseUrl && supabaseAnonKey);
+const defaultSupabaseUrl = "https://qogvqzihbcwhkmxedhnk.supabase.co";
+const defaultSupabaseAnonKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvZ3ZxemloYmN3aGtteGVkaG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzgyMzcsImV4cCI6MjA5MTc1NDIzN30.G_u8U56cq8BXu2bPwfDcMdQDv-kgiG9z50GBEhY0dNI";
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || defaultSupabaseUrl;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || defaultSupabaseAnonKey;
+
 export const supabaseConfigErrorMessage =
-  "Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your deploy environment.";
-
-if (!hasSupabaseEnv) {
-  console.warn(supabaseConfigErrorMessage);
-}
-
-const fallbackUrl = "https://placeholder.supabase.co";
-const fallbackAnonKey = "placeholder-anon-key";
+  "Supabase configuration is unavailable. Check your project URL and anon key.";
 
 export const supabase = createClient(
-  hasSupabaseEnv ? supabaseUrl : fallbackUrl,
-  hasSupabaseEnv ? supabaseAnonKey : fallbackAnonKey,
+  supabaseUrl,
+  supabaseAnonKey,
 );
 
-export const isSupabaseConfigured = hasSupabaseEnv;
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
