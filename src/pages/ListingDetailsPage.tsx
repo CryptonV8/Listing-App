@@ -14,7 +14,9 @@ export default function ListingDetailsPage() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    if (!id) {
+    const listingId = id;
+
+    if (!listingId) {
       setError("Listing not found.");
       setIsLoading(false);
       return;
@@ -24,7 +26,7 @@ export default function ListingDetailsPage() {
 
     async function load() {
       setIsLoading(true);
-      const result = await fetchListingDetails(id);
+      const result = await fetchListingDetails(listingId);
       if (ignore) {
         return;
       }

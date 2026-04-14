@@ -14,7 +14,9 @@ export default function ConfirmDeletePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) {
+    const listingId = id;
+
+    if (!listingId) {
       setError("Listing not found.");
       setIsLoading(false);
       return;
@@ -24,7 +26,7 @@ export default function ConfirmDeletePage() {
 
     async function loadListing() {
       setIsLoading(true);
-      const result = await fetchListingDetails(id);
+      const result = await fetchListingDetails(listingId);
       if (ignore) {
         return;
       }

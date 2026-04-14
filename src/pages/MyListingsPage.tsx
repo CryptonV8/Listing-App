@@ -19,7 +19,10 @@ export default function MyListingsPage() {
   const currentPage = Math.min(page, pageCount);
 
   useEffect(() => {
-    if (!user) {
+    const currentUser = user;
+
+    if (!currentUser) {
+      setIsLoading(false);
       return;
     }
 
@@ -30,7 +33,7 @@ export default function MyListingsPage() {
       const result = await fetchListingsPage({
         page: currentPage,
         pageSize: PAGE_SIZE,
-        ownerId: user.id,
+        ownerId: currentUser.id,
       });
 
       if (ignore) {

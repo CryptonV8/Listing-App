@@ -32,7 +32,9 @@ export default function EditListingPage() {
   );
 
   useEffect(() => {
-    if (!id) {
+    const listingId = id;
+
+    if (!listingId) {
       setError("Listing not found.");
       setIsLoading(false);
       return;
@@ -42,7 +44,7 @@ export default function EditListingPage() {
 
     async function loadListing() {
       setIsLoading(true);
-      const result = await fetchListingDetails(id);
+      const result = await fetchListingDetails(listingId);
 
       if (ignore) {
         return;
