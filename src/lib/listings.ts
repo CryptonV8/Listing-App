@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { isSupabaseConfigured, supabase, supabaseConfigErrorMessage } from "./supabase";
 import type { Listing, ListingDetails, ListingFormValues, ListingPhoto, ListingSeller } from "../types/listing";
 
 const BUCKET = "listing-photos";
@@ -21,6 +21,10 @@ type ListingRow = {
 };
 
 function toPublicImageUrl(path: string) {
+  if (!isSupabaseConfigured) {
+    return "";
+  }
+
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
   return data.publicUrl;
 }
@@ -76,6 +80,10 @@ export async function fetchListingsPage(options: {
   search?: string;
   ownerId?: string;
 }) {
+  if (!isSupabaseConfigured) {
+    return { data: [] as Listing[], count: 0, error: supabaseConfigErrorMessage };
+  }
+
   const start = (options.page - 1) * options.pageSize;
   const end = start + options.pageSize - 1;
 
@@ -111,6 +119,10 @@ export async function fetchListingsPage(options: {
 }
 
 export async function fetchLatestListings(limit: number) {
+  if (!isSupabaseConfigured) {
+    return { data: [] as Listing[], error: supabaseConfigErrorMessage };
+  }
+
   const { data, error } = await supabase
     .from("listings")
     .select("id, owner_id, title, description, price, location, created_at, updated_at, listing_photos(id, storage_path, display_order, created_at)")
@@ -128,6 +140,10 @@ export async function fetchLatestListings(limit: number) {
 }
 
 export async function fetchListingDetails(listingId: string) {
+  if (!isSupabaseConfigured) {
+    return { data: null as ListingDetails | null, error: supabaseConfigErrorMessage };
+  }
+
   const { data: listingRow, error: listingError } = await supabase
     .from("listings")
     .select("id, owner_id, title, description, price, location, created_at, updated_at, listing_photos(id, storage_path, display_order, created_at)")
@@ -167,6 +183,10 @@ export async function fetchListingDetails(listingId: string) {
 }
 
 export async function createListing(ownerId: string, values: ListingFormValues) {
+  if (!isSupabaseConfigured) {
+    return { id: null as string | null, error: supabaseConfigErrorMessage };
+  }
+
   const { data, error } = await supabase
     .from("listings")
     .insert({
@@ -187,6 +207,10 @@ export async function createListing(ownerId: string, values: ListingFormValues) 
 }
 
 export async function updateListing(listingId: string, ownerId: string, values: ListingFormValues) {
+  if (!isSupabaseConfigured) {
+    return { error: supabaseConfigErrorMessage };
+  }
+
   const { error } = await supabase
     .from("listings")
     .update({
@@ -211,6 +235,10 @@ export async function uploadListingPhotos(options: {
   files: File[];
   startOrder?: number;
 }) {
+  if (!isSupabaseConfigured) {
+    return { error: supabaseConfigErrorMessage, photos: [] as ListingPhoto[] };
+  }
+
   if (options.files.length === 0) {
     return { error: null, photos: [] as ListingPhoto[] };
   }
@@ -253,6 +281,10 @@ export async function uploadListingPhotos(options: {
 }
 
 export async function deleteListingPhotos(photos: ListingPhoto[]) {
+  if (!isSupabaseConfigured) {
+    return { error: supabaseConfigErrorMessage };
+  }
+
   if (photos.length === 0) {
     return { error: null };
   }
@@ -274,6 +306,10 @@ export async function deleteListingPhotos(photos: ListingPhoto[]) {
 }
 
 export async function deleteListingWithAssets(listingId: string, ownerId: string) {
+  if (!isSupabaseConfigured) {
+    return { error: supabaseConfigErrorMessage };
+  }
+
   try {
     const { data: photos, error: photoError } = await supabase
       .from("listing_photos")

@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { supabase } from "../lib/supabase";
+import { isSupabaseConfigured, supabase, supabaseConfigErrorMessage } from "../lib/supabase";
 
 type AuthUser = {
   id: string;
@@ -44,6 +44,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
     let mounted = true;
 
     supabase.auth.getUser().then(({ data, error }) => {
@@ -80,6 +86,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading,
       isAuthenticated: Boolean(user),
       login: async (email: string, password: string) => {
+        if (!isSupabaseConfigured) {
+          return { error: supabaseConfigErrorMessage };
+        }
+
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -88,6 +98,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: error?.message ?? null };
       },
       register: async (name: string, email: string, password: string) => {
+        if (!isSupabaseConfigured) {
+          return { error: supabaseConfigErrorMessage };
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -99,6 +113,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: error?.message ?? null };
       },
       logout: async () => {
+        if (!isSupabaseConfigured) {
+          return;
+        }
+
         await supabase.auth.signOut();
       },
     }),

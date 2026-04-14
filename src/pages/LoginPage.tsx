@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { isSupabaseConfigured, supabaseConfigErrorMessage } from "../lib/supabase";
 
 type LocationState = {
   from?: string;
@@ -36,6 +37,7 @@ export default function LoginPage() {
   return (
     <section className="mx-auto max-w-md space-y-4">
       <h1 className="text-2xl font-semibold tracking-tight">Login</h1>
+      {!isSupabaseConfigured ? <p className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{supabaseConfigErrorMessage}</p> : null}
       <form className="space-y-3 rounded border border-zinc-200 bg-white p-4" onSubmit={handleSubmit}>
         <label className="space-y-1 text-sm" htmlFor="login-email">
           <span className="text-zinc-600">Email</span>
@@ -66,7 +68,7 @@ export default function LoginPage() {
         <button
           className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !isSupabaseConfigured}
         >
           {isSubmitting ? "Signing in..." : "Continue"}
         </button>
