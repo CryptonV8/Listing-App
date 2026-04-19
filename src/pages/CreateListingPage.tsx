@@ -19,13 +19,13 @@ export default function CreateListingPage() {
     event.preventDefault();
 
     if (!user) {
-      setError("You need to be logged in.");
+      setError("Трябва да си влязъл в профила си.");
       return;
     }
 
     const parsedPrice = Number(price);
     if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
-      setError("Price must be a valid number.");
+      setError("Цената трябва да е валидно число.");
       return;
     }
 
@@ -40,7 +40,7 @@ export default function CreateListingPage() {
     });
 
     if (!createResult.id || createResult.error) {
-      setError(createResult.error ?? "Could not create listing.");
+      setError(createResult.error ?? "Офертата не можа да бъде създадена.");
       setIsSubmitting(false);
       return;
     }
@@ -63,20 +63,20 @@ export default function CreateListingPage() {
 
   return (
     <section className="mx-auto max-w-xl space-y-4">
-      <h1 className="text-2xl font-semibold tracking-tight">Create Listing</h1>
-      <p className="text-sm text-zinc-600">Publish a new listing and upload cover/gallery photos.</p>
+      <h1 className="text-2xl font-semibold tracking-tight">Нова оферта</h1>
+      <p className="text-sm text-zinc-600">Публикувай нова оферта и качи основни и допълнителни снимки.</p>
 
       <form className="space-y-3 rounded border border-zinc-200 bg-white p-4" onSubmit={handleSubmit}>
         <input
           className="w-full rounded border border-zinc-300 px-3 py-2"
-          placeholder="Title"
+          placeholder="Заглавие"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           required
         />
         <input
           className="w-full rounded border border-zinc-300 px-3 py-2"
-          placeholder="Price"
+          placeholder="Цена"
           type="number"
           min="0"
           step="0.01"
@@ -86,28 +86,28 @@ export default function CreateListingPage() {
         />
         <input
           className="w-full rounded border border-zinc-300 px-3 py-2"
-          placeholder="Location"
+          placeholder="Локация"
           value={location}
           onChange={(event) => setLocation(event.target.value)}
           required
         />
         <textarea
           className="min-h-28 w-full rounded border border-zinc-300 px-3 py-2"
-          placeholder="Description"
+          placeholder="Описание"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
           required
         />
 
         <label className="block rounded border border-dashed border-zinc-300 p-3 text-sm text-zinc-600">
-          <span className="mb-2 block font-medium text-zinc-700">Listing photos (multiple)</span>
+          <span className="mb-2 block font-medium text-zinc-700">Снимки на офертата (няколко файла)</span>
           <input
             type="file"
             multiple
             accept="image/*"
             onChange={(event) => setFiles(Array.from(event.target.files ?? []))}
           />
-          {files.length > 0 ? <p className="mt-2 text-xs">Selected: {files.length} files</p> : null}
+          {files.length > 0 ? <p className="mt-2 text-xs">Избрани: {files.length} файла</p> : null}
         </label>
 
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
@@ -117,12 +117,12 @@ export default function CreateListingPage() {
           type="submit"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Saving listing..." : "Create listing"}
+          {isSubmitting ? "Записване на офертата..." : "Публикувай офертата"}
         </button>
       </form>
 
       <Link className="text-sm font-medium underline" to="/my-listings">
-        Back to my listings
+        Обратно към моите оферти
       </Link>
     </section>
   );

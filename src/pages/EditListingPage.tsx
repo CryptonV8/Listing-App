@@ -35,7 +35,7 @@ export default function EditListingPage() {
     const listingId = id;
 
     if (!listingId) {
-      setError("Listing not found.");
+      setError("Офертата не е намерена.");
       setIsLoading(false);
       return;
     }
@@ -51,7 +51,7 @@ export default function EditListingPage() {
       }
 
       if (!result.data || result.error) {
-        setError(result.error ?? "Listing not found.");
+        setError(result.error ?? "Офертата не е намерена.");
         setIsLoading(false);
         return;
       }
@@ -83,13 +83,13 @@ export default function EditListingPage() {
     event.preventDefault();
 
     if (!id || !user) {
-      setError("Unauthorized.");
+      setError("Нямаш права за това действие.");
       return;
     }
 
     const parsedPrice = Number(price);
     if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
-      setError("Price must be a valid number.");
+      setError("Цената трябва да е валидно число.");
       return;
     }
 
@@ -137,16 +137,16 @@ export default function EditListingPage() {
   };
 
   if (isLoading) {
-    return <p className="text-sm text-zinc-600">Loading listing...</p>;
+    return <p className="text-sm text-zinc-600">Зареждане на офертата...</p>;
   }
 
   if (error && !ownerId) {
     return (
       <section className="space-y-3">
-        <h1 className="text-2xl font-semibold tracking-tight">Listing not found</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Офертата не е намерена</h1>
         <p className="text-sm text-red-600">{error}</p>
         <Link className="text-sm font-medium underline" to="/my-listings">
-          Back to my listings
+          Обратно към моите оферти
         </Link>
       </section>
     );
@@ -155,10 +155,10 @@ export default function EditListingPage() {
   if (ownerId !== user?.id) {
     return (
       <section className="space-y-3">
-        <h1 className="text-2xl font-semibold tracking-tight">Not allowed</h1>
-        <p className="text-sm text-zinc-600">You can only edit your own listings.</p>
+        <h1 className="text-2xl font-semibold tracking-tight">Нямаш достъп</h1>
+        <p className="text-sm text-zinc-600">Можеш да редактираш само собствените си оферти.</p>
         <Link className="text-sm font-medium underline" to="/my-listings">
-          Back to my listings
+          Обратно към моите оферти
         </Link>
       </section>
     );
@@ -166,8 +166,8 @@ export default function EditListingPage() {
 
   return (
     <section className="mx-auto max-w-xl space-y-4">
-      <h1 className="text-2xl font-semibold tracking-tight">Edit Listing</h1>
-      <p className="text-sm text-zinc-600">Update listing details and manage listing photos.</p>
+      <h1 className="text-2xl font-semibold tracking-tight">Редакция на оферта</h1>
+      <p className="text-sm text-zinc-600">Обнови детайлите и управлявай снимките към офертата.</p>
 
       {visiblePhotos.length > 0 ? (
         <div className="grid grid-cols-2 gap-3 rounded border border-zinc-200 bg-white p-3">
@@ -179,7 +179,7 @@ export default function EditListingPage() {
                 type="button"
                 onClick={() => toggleRemovePhoto(photo.id)}
               >
-                Remove
+                Премахни
               </button>
             </div>
           ))}
@@ -187,7 +187,7 @@ export default function EditListingPage() {
       ) : null}
 
       {removablePhotos.length > 0 ? (
-        <p className="text-xs text-zinc-500">{removablePhotos.length} photo(s) marked for removal.</p>
+        <p className="text-xs text-zinc-500">{removablePhotos.length} снимка(и) са маркирани за премахване.</p>
       ) : null}
 
       <form className="space-y-3 rounded border border-zinc-200 bg-white p-4" onSubmit={handleSubmit}>
@@ -220,14 +220,14 @@ export default function EditListingPage() {
         />
 
         <label className="block rounded border border-dashed border-zinc-300 p-3 text-sm text-zinc-600">
-          <span className="mb-2 block font-medium text-zinc-700">Upload additional photos</span>
+          <span className="mb-2 block font-medium text-zinc-700">Качи допълнителни снимки</span>
           <input
             type="file"
             multiple
             accept="image/*"
             onChange={(event) => setFiles(Array.from(event.target.files ?? []))}
           />
-          {files.length > 0 ? <p className="mt-2 text-xs">Selected: {files.length} files</p> : null}
+          {files.length > 0 ? <p className="mt-2 text-xs">Избрани: {files.length} файла</p> : null}
         </label>
 
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
@@ -237,7 +237,7 @@ export default function EditListingPage() {
           type="submit"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Saving changes..." : "Save changes"}
+          {isSubmitting ? "Записване на промените..." : "Запази промените"}
         </button>
       </form>
     </section>

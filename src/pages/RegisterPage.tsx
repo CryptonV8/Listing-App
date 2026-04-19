@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { isSupabaseConfigured, supabaseConfigErrorMessage } from "../lib/supabase";
 
 export default function RegisterPage() {
-  const [name, setName] = useState("New User");
+  const [name, setName] = useState("Нов потребител");
   const [email, setEmail] = useState("newuser@example.com");
   const [password, setPassword] = useState("pass123");
   const [error, setError] = useState<string | null>(null);
@@ -29,11 +29,11 @@ export default function RegisterPage() {
 
   return (
     <section className="mx-auto max-w-md space-y-4">
-      <h1 className="text-2xl font-semibold tracking-tight">Register</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Регистрация</h1>
       {!isSupabaseConfigured ? <p className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{supabaseConfigErrorMessage}</p> : null}
       <form className="space-y-3 rounded border border-zinc-200 bg-white p-4" onSubmit={handleSubmit}>
         <label className="space-y-1 text-sm" htmlFor="register-name">
-          <span className="text-zinc-600">Name</span>
+          <span className="text-zinc-600">Име</span>
           <input
             className="w-full rounded border border-zinc-300 px-3 py-2 outline-none ring-zinc-900 focus:ring"
             id="register-name"
@@ -45,7 +45,7 @@ export default function RegisterPage() {
         </label>
 
         <label className="space-y-1 text-sm" htmlFor="register-email">
-          <span className="text-zinc-600">Email</span>
+          <span className="text-zinc-600">Имейл</span>
           <input
             className="w-full rounded border border-zinc-300 px-3 py-2 outline-none ring-zinc-900 focus:ring"
             id="register-email"
@@ -57,7 +57,7 @@ export default function RegisterPage() {
         </label>
 
         <label className="space-y-1 text-sm" htmlFor="register-password">
-          <span className="text-zinc-600">Password</span>
+          <span className="text-zinc-600">Парола</span>
           <input
             className="w-full rounded border border-zinc-300 px-3 py-2 outline-none ring-zinc-900 focus:ring"
             id="register-password"
@@ -76,12 +76,12 @@ export default function RegisterPage() {
           type="submit"
           disabled={isSubmitting || !isSupabaseConfigured}
         >
-          {isSubmitting ? "Creating account..." : "Create account"}
+          {isSubmitting ? "Създаване на профил..." : "Създай профил"}
         </button>
       </form>
 
       <p className="text-sm text-zinc-600">
-        Already have an account? <Link className="underline" to="/login">Login</Link>
+        Вече имаш профил? <Link className="underline" to="/login">Влез</Link>
       </p>
     </section>
   );

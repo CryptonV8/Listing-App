@@ -17,7 +17,7 @@ export default function ConfirmDeletePage() {
     const listingId = id;
 
     if (!listingId) {
-      setError("Listing not found.");
+      setError("Офертата не е намерена.");
       setIsLoading(false);
       return;
     }
@@ -32,7 +32,7 @@ export default function ConfirmDeletePage() {
       }
 
       if (!result.data || result.error) {
-        setError(result.error ?? "Listing not found.");
+        setError(result.error ?? "Офертата не е намерена.");
         setIsLoading(false);
         return;
       }
@@ -52,7 +52,7 @@ export default function ConfirmDeletePage() {
 
   const handleDelete = async () => {
     if (!id || !user) {
-      setError("Unauthorized.");
+      setError("Нямаш права за това действие.");
       return;
     }
 
@@ -70,16 +70,16 @@ export default function ConfirmDeletePage() {
   };
 
   if (isLoading) {
-    return <p className="text-sm text-zinc-600">Loading listing...</p>;
+    return <p className="text-sm text-zinc-600">Зареждане на офертата...</p>;
   }
 
   if (error && !ownerId) {
     return (
       <section className="space-y-3">
-        <h1 className="text-2xl font-semibold tracking-tight">Listing not found</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Офертата не е намерена</h1>
         <p className="text-sm text-red-600">{error}</p>
         <Link className="text-sm font-medium underline" to="/my-listings">
-          Back to my listings
+          Обратно към моите оферти
         </Link>
       </section>
     );
@@ -88,10 +88,10 @@ export default function ConfirmDeletePage() {
   if (ownerId !== user?.id) {
     return (
       <section className="space-y-3">
-        <h1 className="text-2xl font-semibold tracking-tight">Not allowed</h1>
-        <p className="text-sm text-zinc-600">You can only delete your own listings.</p>
+        <h1 className="text-2xl font-semibold tracking-tight">Нямаш достъп</h1>
+        <p className="text-sm text-zinc-600">Можеш да изтриваш само собствените си оферти.</p>
         <Link className="text-sm font-medium underline" to="/my-listings">
-          Back to my listings
+          Обратно към моите оферти
         </Link>
       </section>
     );
@@ -99,11 +99,11 @@ export default function ConfirmDeletePage() {
 
   return (
     <section className="mx-auto max-w-xl space-y-4">
-      <h1 className="text-2xl font-semibold tracking-tight">Confirm delete</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Потвърди изтриването</h1>
       <p className="text-sm text-zinc-700">
-        Are you sure you want to delete <span className="font-semibold">{title}</span>?
+        Сигурен ли си, че искаш да изтриеш <span className="font-semibold">{title}</span>?
       </p>
-      <p className="text-sm text-zinc-500">This action also removes uploaded photos from Supabase storage.</p>
+      <p className="text-sm text-zinc-500">Това действие ще премахне и качените снимки от хранилището.</p>
 
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
@@ -116,11 +116,11 @@ export default function ConfirmDeletePage() {
           }}
           disabled={isDeleting}
         >
-          {isDeleting ? "Deleting..." : "Confirm delete"}
+          {isDeleting ? "Изтриване..." : "Потвърди изтриването"}
         </button>
 
         <Link className="rounded border border-zinc-300 px-4 py-2 text-sm font-medium" to="/my-listings">
-          Cancel
+          Отказ
         </Link>
       </div>
     </section>

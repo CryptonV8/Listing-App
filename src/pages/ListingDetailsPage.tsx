@@ -17,7 +17,7 @@ export default function ListingDetailsPage() {
     const listingId = id;
 
     if (!listingId) {
-      setError("Listing not found.");
+      setError("Офертата не е намерена.");
       setIsLoading(false);
       return;
     }
@@ -55,16 +55,16 @@ export default function ListingDetailsPage() {
   const currentImage = images[Math.min(activeIndex, images.length - 1)] ?? fallbackImage;
 
   if (isLoading) {
-    return <p className="text-sm text-zinc-600">Loading listing...</p>;
+    return <p className="text-sm text-zinc-600">Зареждане на офертата...</p>;
   }
 
   if (!listing || error) {
     return (
       <section className="space-y-3">
-        <h1 className="text-2xl font-semibold tracking-tight">Listing Not Found</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Офертата не е намерена</h1>
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         <Link className="text-sm font-medium underline" to="/listings">
-          Back to browse
+          Обратно към офертите
         </Link>
       </section>
     );
@@ -81,17 +81,17 @@ export default function ListingDetailsPage() {
               type="button"
               onClick={() => setActiveIndex((prev) => (prev - 1 + images.length) % images.length)}
             >
-              Previous photo
+              Предишна снимка
             </button>
             <p className="text-xs text-zinc-500">
-              Photo {Math.min(activeIndex + 1, images.length)} of {images.length}
+              Снимка {Math.min(activeIndex + 1, images.length)} от {images.length}
             </p>
             <button
               className="rounded border border-zinc-300 bg-white px-3 py-1 text-sm"
               type="button"
               onClick={() => setActiveIndex((prev) => (prev + 1) % images.length)}
             >
-              Next photo
+              Следваща снимка
             </button>
           </div>
         ) : null}
@@ -100,21 +100,21 @@ export default function ListingDetailsPage() {
       <div className="space-y-2 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
         <h1 className="text-2xl font-semibold tracking-tight">{listing.title}</h1>
         <p className="text-sm text-zinc-600">{listing.location}</p>
-        <p className="text-lg font-semibold">${listing.price}</p>
+        <p className="text-lg font-semibold">{listing.price.toLocaleString("bg-BG")} лв.</p>
         <p className="text-sm text-zinc-700">{listing.description}</p>
-        <p className="text-xs text-zinc-500">Created {new Date(listing.createdAt).toLocaleString()}</p>
+        <p className="text-xs text-zinc-500">Публикувана: {new Date(listing.createdAt).toLocaleString("bg-BG")}</p>
       </div>
 
       <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-2 text-lg font-semibold">Seller contacts</h2>
+        <h2 className="mb-2 text-lg font-semibold">Контакти на продавача</h2>
         {listing.seller ? (
           <div className="space-y-1 text-sm text-zinc-700">
-            <p>Name: {listing.seller.name || "Unknown"}</p>
-            <p>Email: {listing.seller.email}</p>
-            <p>Phone: {listing.seller.phone ?? "Not provided"}</p>
+            <p>Име: {listing.seller.name || "Не е посочено"}</p>
+            <p>Имейл: {listing.seller.email}</p>
+            <p>Телефон: {listing.seller.phone ?? "Не е посочен"}</p>
           </div>
         ) : (
-          <p className="text-sm text-zinc-600">Seller profile is not available.</p>
+          <p className="text-sm text-zinc-600">Профилът на продавача не е наличен.</p>
         )}
       </div>
     </section>

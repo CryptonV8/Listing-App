@@ -6,7 +6,7 @@ export default function ProtectedRoute() {
   const location = useLocation();
 
   if (isLoading) {
-    return <p className="rounded-xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600">Checking your session...</p>;
+    return <p className="rounded-xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600">Проверяваме твоята сесия...</p>;
   }
 
   if (!isAuthenticated) {

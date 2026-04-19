@@ -34,24 +34,28 @@ export default function HomePage() {
   return (
     <section className="space-y-8">
       <div className="space-y-4 rounded-3xl border border-zinc-200 bg-[radial-gradient(circle_at_20%_20%,#fef3c7_0%,#fff_45%,#e0f2fe_100%)] p-6 shadow-sm">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Welcome to Listings. Find your next place.</h1>
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Добре дошли в imotbg.org</h1>
+        <p className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">Открий своя нов дом.</p>
         <p className="max-w-2xl text-sm text-zinc-700">
-          Browse the newest community listings or sign in to publish your own.
+          Разгледай актуални оферти за продажба и наем в цяла България или публикувай своята обява бързо и лесно.
         </p>
         <Link className="inline-block rounded-xl bg-zinc-900 px-4 py-2 text-sm font-medium text-white" to="/listings">
-          Explore Listings
+          Разгледай офертите
         </Link>
+        <p className="max-w-2xl text-sm text-zinc-700">
+          Имаш имот за продажба или под наем? Публикувай своята оферта в imotbg.org и достигни до реални купувачи и наематели.
+        </p>
       </div>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold tracking-tight">Latest Listings</h2>
+          <h2 className="text-xl font-semibold tracking-tight">Най-нови оферти</h2>
           <Link className="text-sm font-medium underline" to="/listings">
-            View all
+            Виж всички
           </Link>
         </div>
 
-        {isLoading ? <p className="text-sm text-zinc-600">Loading latest listings...</p> : null}
+        {isLoading ? <p className="text-sm text-zinc-600">Зареждане на най-новите оферти...</p> : null}
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
         {!isLoading && !error ? (

@@ -62,13 +62,13 @@ export default function MyListingsPage() {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">My Listings</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Моите оферти</h1>
         <Link className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white" to="/dashboard/create">
-          Add Listing
+          Добави оферта
         </Link>
       </div>
 
-      {isLoading ? <p className="text-sm text-zinc-600">Loading your listings...</p> : null}
+      {isLoading ? <p className="text-sm text-zinc-600">Зареждане на твоите оферти...</p> : null}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       {!isLoading && !error && listings.length > 0 ? (
@@ -80,10 +80,10 @@ export default function MyListingsPage() {
               actions={
                 <>
                   <Link className="font-medium underline" to={`/dashboard/edit/${listing.id}`}>
-                    Edit
+                    Редактирай
                   </Link>
                   <Link className="font-medium text-red-700 underline" to={`/dashboard/delete/${listing.id}`}>
-                    Delete
+                    Изтрий
                   </Link>
                 </>
               }
@@ -94,13 +94,13 @@ export default function MyListingsPage() {
 
       {!isLoading && !error && listings.length === 0 ? (
         <p className="rounded border border-dashed border-zinc-300 bg-white p-4 text-sm text-zinc-600">
-          You have no listings yet.
+          Все още нямаш публикувани оферти.
         </p>
       ) : null}
 
       <div className="flex items-center justify-between text-sm">
         <p className="text-zinc-600">
-          Page {currentPage} of {pageCount}
+          Страница {currentPage} от {pageCount}
         </p>
         <div className="flex gap-2">
           <button
@@ -109,7 +109,7 @@ export default function MyListingsPage() {
             onClick={() => setPage((prev) => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
           >
-            Previous
+            Назад
           </button>
           <button
             className="rounded border border-zinc-300 bg-white px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50"
@@ -117,7 +117,7 @@ export default function MyListingsPage() {
             onClick={() => setPage((prev) => Math.min(pageCount, prev + 1))}
             disabled={currentPage === pageCount}
           >
-            Next
+            Напред
           </button>
         </div>
       </div>

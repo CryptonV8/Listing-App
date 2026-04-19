@@ -8,7 +8,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || defaultSupabaseUrl;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || defaultSupabaseAnonKey;
 
 export const supabaseConfigErrorMessage =
-  "Supabase configuration is unavailable. Check your project URL and anon key.";
+  "Supabase не е конфигуриран. Добави VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY в средата за деплой.";
 
 export const supabase = createClient(
   supabaseUrl,

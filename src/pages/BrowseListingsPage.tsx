@@ -48,16 +48,16 @@ export default function BrowseListingsPage() {
     <section className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Browse Listings</h1>
-          <p className="text-sm text-zinc-600">Search and browse available listings.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">Разгледай офертите</h1>
+          <p className="text-sm text-zinc-600">Търси и разглеждай налични имоти за продажба и наем.</p>
         </div>
 
         <label className="w-full max-w-sm space-y-1 text-sm" htmlFor="listing-search">
-          <span className="text-zinc-600">Search</span>
+          <span className="text-zinc-600">Търсене</span>
           <input
             className="w-full rounded border border-zinc-300 bg-white px-3 py-2 outline-none ring-zinc-900 focus:ring"
             id="listing-search"
-            placeholder="Search by title or location"
+            placeholder="Търси по заглавие, квартал, град или област"
             value={searchQuery}
             onChange={(event) => {
               setSearchQuery(event.target.value);
@@ -67,7 +67,7 @@ export default function BrowseListingsPage() {
         </label>
       </div>
 
-      {isLoading ? <p className="text-sm text-zinc-600">Loading listings...</p> : null}
+      {isLoading ? <p className="text-sm text-zinc-600">Зареждане на офертите...</p> : null}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       {!isLoading && !error && listings.length > 0 ? (
@@ -80,13 +80,13 @@ export default function BrowseListingsPage() {
 
       {!isLoading && !error && listings.length === 0 ? (
         <p className="rounded border border-dashed border-zinc-300 bg-white p-4 text-sm text-zinc-600">
-          No listings found for your search.
+          Няма намерени оферти за търсените критерии.
         </p>
       ) : null}
 
       <div className="flex items-center justify-between text-sm">
         <p className="text-zinc-600">
-          Page {currentPage} of {pageCount}
+          Страница {currentPage} от {pageCount}
         </p>
         <div className="flex gap-2">
           <button
@@ -95,7 +95,7 @@ export default function BrowseListingsPage() {
             onClick={() => setPage((prev) => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
           >
-            Previous
+            Назад
           </button>
           <button
             className="rounded border border-zinc-300 bg-white px-3 py-1 disabled:cursor-not-allowed disabled:opacity-50"
@@ -103,7 +103,7 @@ export default function BrowseListingsPage() {
             onClick={() => setPage((prev) => Math.min(pageCount, prev + 1))}
             disabled={currentPage === pageCount}
           >
-            Next
+            Напред
           </button>
         </div>
       </div>

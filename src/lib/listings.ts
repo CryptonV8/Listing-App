@@ -151,7 +151,7 @@ export async function fetchListingDetails(listingId: string) {
     .single();
 
   if (listingError || !listingRow) {
-    return { data: null as ListingDetails | null, error: listingError?.message ?? "Listing not found." };
+    return { data: null as ListingDetails | null, error: listingError?.message ?? "Офертата не е намерена." };
   }
 
   const { data: sellerRow } = await supabase
@@ -200,7 +200,7 @@ export async function createListing(ownerId: string, values: ListingFormValues) 
     .single();
 
   if (error || !data) {
-    return { id: null as string | null, error: error?.message ?? "Could not create listing." };
+    return { id: null as string | null, error: error?.message ?? "Офертата не можа да бъде създадена." };
   }
 
   return { id: data.id, error: null };
@@ -338,6 +338,6 @@ export async function deleteListingWithAssets(listingId: string, ownerId: string
 
     return { error: null };
   } catch (error) {
-    return { error: normalizeError(error, "Could not delete listing.") };
+    return { error: normalizeError(error, "Офертата не можа да бъде изтрита.") };
   }
 }

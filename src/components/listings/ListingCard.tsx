@@ -17,7 +17,7 @@ export default function ListingCard({ listing, actions }: ListingCardProps) {
       <div className="space-y-2 p-4">
         <div className="flex items-start justify-between gap-2">
           <h3 className="line-clamp-1 text-base font-semibold">{listing.title}</h3>
-          <p className="text-sm font-semibold">${listing.price}</p>
+          <p className="text-sm font-semibold">{listing.price.toLocaleString("bg-BG")} лв.</p>
         </div>
 
         <p className="line-clamp-2 text-xs text-zinc-600">{listing.description}</p>
@@ -25,7 +25,7 @@ export default function ListingCard({ listing, actions }: ListingCardProps) {
         <p className="text-xs text-zinc-500">{new Date(listing.createdAt).toLocaleDateString()}</p>
 
         <Link className="inline-block text-sm font-medium underline" to={`/listing/${listing.id}`}>
-          View details
+          Виж подробности
         </Link>
 
         {actions ? <div className="flex items-center gap-3 text-sm">{actions}</div> : null}

@@ -36,11 +36,11 @@ export default function LoginPage() {
 
   return (
     <section className="mx-auto max-w-md space-y-4">
-      <h1 className="text-2xl font-semibold tracking-tight">Login</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Вход</h1>
       {!isSupabaseConfigured ? <p className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{supabaseConfigErrorMessage}</p> : null}
       <form className="space-y-3 rounded border border-zinc-200 bg-white p-4" onSubmit={handleSubmit}>
         <label className="space-y-1 text-sm" htmlFor="login-email">
-          <span className="text-zinc-600">Email</span>
+          <span className="text-zinc-600">Имейл</span>
           <input
             className="w-full rounded border border-zinc-300 px-3 py-2 outline-none ring-zinc-900 focus:ring"
             id="login-email"
@@ -52,7 +52,7 @@ export default function LoginPage() {
         </label>
 
         <label className="space-y-1 text-sm" htmlFor="login-password">
-          <span className="text-zinc-600">Password</span>
+          <span className="text-zinc-600">Парола</span>
           <input
             className="w-full rounded border border-zinc-300 px-3 py-2 outline-none ring-zinc-900 focus:ring"
             id="login-password"
@@ -70,12 +70,12 @@ export default function LoginPage() {
           type="submit"
           disabled={isSubmitting || !isSupabaseConfigured}
         >
-          {isSubmitting ? "Signing in..." : "Continue"}
+          {isSubmitting ? "Влизане..." : "Вход"}
         </button>
       </form>
 
       <p className="text-sm text-zinc-600">
-        No account yet? <Link className="underline" to="/register">Register</Link>
+        Нямаш профил? <Link className="underline" to="/register">Регистрирай се</Link>
       </p>
     </section>
   );

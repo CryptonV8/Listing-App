@@ -11,24 +11,24 @@ export default function Navbar() {
     <header className="mb-8 rounded-2xl border border-zinc-200 bg-white/80 p-4 shadow-sm backdrop-blur">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link className="text-lg font-bold tracking-tight" to="/">
-          React Listings
+          imotbg.org
         </Link>
 
         <nav className="flex flex-wrap items-center gap-4 text-sm font-medium">
           <NavLink className={navLinkClass} to="/" end>
-            Home
+            Начало
           </NavLink>
           <NavLink className={navLinkClass} to="/listings">
-            Browse
+            Разгледай
           </NavLink>
 
           {isAuthenticated ? (
             <>
               <NavLink className={navLinkClass} to="/my-listings">
-                My Listings
+                Моите оферти
               </NavLink>
               <NavLink className={navLinkClass} to="/dashboard/create">
-                Create
+                Добави оферта
               </NavLink>
               <button
                 className="rounded border border-zinc-300 px-3 py-1 text-xs text-zinc-700 hover:bg-zinc-100"
@@ -37,16 +37,16 @@ export default function Navbar() {
                   void logout();
                 }}
               >
-                Logout
+                Изход
               </button>
             </>
           ) : (
             <>
               <NavLink className={navLinkClass} to="/login">
-                Login
+                Вход
               </NavLink>
               <NavLink className={navLinkClass} to="/register">
-                Register
+                Регистрация
               </NavLink>
             </>
           )}
@@ -55,7 +55,7 @@ export default function Navbar() {
 
       {isAuthenticated && user ? (
         <p className="mt-3 text-xs text-zinc-500">
-          Signed in as {user.name ? `${user.name} · ` : ""}
+          Влязъл като {user.name ? `${user.name} · ` : ""}
           {user.email}
         </p>
       ) : null}
