@@ -2,12 +2,15 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useUserRole } from "../hooks/useUserRole";
+import { adminUpdateListing } from "../lib/admin";
 import { deleteListingPhotos, fetchListingDetails, updateListing, uploadListingPhotos } from "../lib/listings";
 import type { ListingPhoto } from "../types/listing";
 
 export default function EditListingPage() {
   const { id } = useParams();
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -96,12 +99,19 @@ export default function EditListingPage() {
     setError(null);
     setIsSubmitting(true);
 
-    const updateResult = await updateListing(id, user.id, {
-      title,
-      description,
-      price: parsedPrice,
-      location,
-    });
+    const updateResult = isAdmin
+      ? await adminUpdateListing(id, {
+          title,
+          description,
+          price: parsedPrice,
+          location,
+        })
+      : await updateListing(id, user.id, {
+          title,
+          description,
+          price: parsedPrice,
+          location,
+        });
 
     if (updateResult.error) {
       setError(updateResult.error);
@@ -152,7 +162,7 @@ export default function EditListingPage() {
     );
   }
 
-  if (ownerId !== user?.id) {
+  if (!isAdmin && ownerId !== user?.id) {
     return (
       <section className="space-y-3">
         <h1 className="text-2xl font-semibold tracking-tight">Нямаш достъп</h1>

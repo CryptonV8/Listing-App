@@ -17,7 +17,9 @@ type AuthUser = {
 type AuthContextValue = {
   user: AuthUser | null;
   isLoading: boolean;
+  isRoleLoading: boolean;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   login: (email: string, password: string) => Promise<{ error: string | null }>;
   register: (name: string, email: string, password: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
@@ -42,17 +44,34 @@ function mapAuthUser(user: { id: string; email?: string | null; user_metadata?: 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRoleLoading, setIsRoleLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    async function loadAdminStatus(userId: string | null) {
+      if (!userId) {
+        setIsAdmin(false);
+        setIsRoleLoading(false);
+        return;
+      }
+
+      setIsRoleLoading(true);
+      const { data, error } = await supabase.rpc("is_admin", { check_user_id: userId });
+      setIsAdmin(!error && Boolean(data));
+      setIsRoleLoading(false);
+    }
+
     if (!isSupabaseConfigured) {
       setUser(null);
       setIsLoading(false);
+      setIsAdmin(false);
+      setIsRoleLoading(false);
       return;
     }
 
     let mounted = true;
 
-    supabase.auth.getUser().then(({ data, error }) => {
+    supabase.auth.getUser().then(async ({ data, error }) => {
       if (!mounted) {
         return;
       }
@@ -60,18 +79,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) {
         setUser(null);
         setIsLoading(false);
+        setIsAdmin(false);
+        setIsRoleLoading(false);
         return;
       }
 
-      setUser(mapAuthUser(data.user));
+      const mappedUser = mapAuthUser(data.user);
+      setUser(mappedUser);
       setIsLoading(false);
+      await loadAdminStatus(mappedUser?.id ?? null);
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(mapAuthUser(session?.user ?? null));
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const mappedUser = mapAuthUser(session?.user ?? null);
+      setUser(mappedUser);
       setIsLoading(false);
+      await loadAdminStatus(mappedUser?.id ?? null);
     });
 
     return () => {
@@ -84,7 +109,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       isLoading,
+      isRoleLoading,
       isAuthenticated: Boolean(user),
+      isAdmin,
       login: async (email: string, password: string) => {
         if (!isSupabaseConfigured) {
           return { error: supabaseConfigErrorMessage };
@@ -114,13 +141,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       logout: async () => {
         if (!isSupabaseConfigured) {
+          setIsAdmin(false);
+          setIsRoleLoading(false);
           return;
         }
 
         await supabase.auth.signOut();
       },
     }),
-    [isLoading, user],
+    [isAdmin, isLoading, isRoleLoading, user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

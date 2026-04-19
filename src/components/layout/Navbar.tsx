@@ -5,7 +5,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `transition-colors ${isActive ? "text-black" : "text-zinc-500 hover:text-zinc-900"}`;
 
 export default function Navbar() {
-  const { isAuthenticated, logout, user } = useAuth();
+  const { isAdmin, isAuthenticated, logout, user } = useAuth();
 
   return (
     <header className="mb-8 rounded-2xl border border-zinc-200 bg-white/80 p-4 shadow-sm backdrop-blur">
@@ -30,6 +30,11 @@ export default function Navbar() {
               <NavLink className={navLinkClass} to="/dashboard/create">
                 Добави оферта
               </NavLink>
+              {isAdmin ? (
+                <NavLink className={navLinkClass} to="/admin">
+                  Админ панел
+                </NavLink>
+              ) : null}
               <button
                 className="rounded border border-zinc-300 px-3 py-1 text-xs text-zinc-700 hover:bg-zinc-100"
                 type="button"

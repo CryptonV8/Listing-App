@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import AppShell from "./components/layout/AppShell";
+import AdminRoute from "./components/routing/AdminRoute";
 import ProtectedRoute from "./components/routing/ProtectedRoute";
 import BrowseListingsPage from "./pages/BrowseListingsPage";
 import ConfirmDeletePage from "./pages/ConfirmDeletePage";
@@ -11,6 +12,9 @@ import LoginPage from "./pages/LoginPage";
 import MyListingsPage from "./pages/MyListingsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import RegisterPage from "./pages/RegisterPage";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import AdminListingsPage from "./pages/admin/AdminListingsPage";
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
 
 export default function App() {
   return (
@@ -27,6 +31,12 @@ export default function App() {
           <Route path="/dashboard/create" element={<CreateListingPage />} />
           <Route path="/dashboard/edit/:id" element={<EditListingPage />} />
           <Route path="/dashboard/delete/:id" element={<ConfirmDeletePage />} />
+
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin/listings" element={<AdminListingsPage />} />
+            <Route path="/admin/users" element={<AdminUsersPage />} />
+          </Route>
 
           <Route path="/create" element={<CreateListingPage />} />
           <Route path="/edit/:id" element={<EditListingPage />} />

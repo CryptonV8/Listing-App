@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useUserRole } from "../hooks/useUserRole";
+import { adminDeleteListingWithAssets } from "../lib/admin";
 import { deleteListingWithAssets, fetchListingDetails } from "../lib/listings";
 
 export default function ConfirmDeletePage() {
   const { id } = useParams();
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [ownerId, setOwnerId] = useState<string | null>(null);
@@ -59,7 +62,10 @@ export default function ConfirmDeletePage() {
     setIsDeleting(true);
     setError(null);
 
-    const result = await deleteListingWithAssets(id, user.id);
+    const result = isAdmin
+      ? await adminDeleteListingWithAssets(id)
+      : await deleteListingWithAssets(id, user.id);
+
     if (result.error) {
       setError(result.error);
       setIsDeleting(false);
@@ -85,7 +91,7 @@ export default function ConfirmDeletePage() {
     );
   }
 
-  if (ownerId !== user?.id) {
+  if (!isAdmin && ownerId !== user?.id) {
     return (
       <section className="space-y-3">
         <h1 className="text-2xl font-semibold tracking-tight">Нямаш достъп</h1>
