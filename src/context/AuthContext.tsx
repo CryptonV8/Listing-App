@@ -140,13 +140,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: error?.message ?? null };
       },
       logout: async () => {
+        // Always clear local auth state first so the UI can recover immediately.
+        setUser(null);
+        setIsAdmin(false);
+        setIsRoleLoading(false);
+
         if (!isSupabaseConfigured) {
-          setIsAdmin(false);
-          setIsRoleLoading(false);
           return;
         }
 
-        await supabase.auth.signOut();
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          console.warn("Грешка при изход:", error.message);
+        }
       },
     }),
     [isAdmin, isLoading, isRoleLoading, user],
