@@ -13,6 +13,7 @@ export default function CreateListingPage() {
   const [location, setLocation] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStep, setSubmitStep] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -33,6 +34,7 @@ export default function CreateListingPage() {
     setIsSubmitting(true);
 
     try {
+      setSubmitStep("Създаване на офертата...");
       const createResult = await createListing(user.id, {
         title,
         description,
@@ -45,6 +47,7 @@ export default function CreateListingPage() {
         return;
       }
 
+      setSubmitStep("Качване на снимките...");
       const uploadResult = await uploadListingPhotos({
         listingId: createResult.id,
         ownerId: user.id,
@@ -58,9 +61,11 @@ export default function CreateListingPage() {
 
       navigate("/my-listings", { replace: true });
     } catch (caughtError) {
+      console.error("Грешка при публикуване на оферта:", caughtError);
       const message = caughtError instanceof Error ? caughtError.message : "Публикуването не успя.";
       setError(message);
     } finally {
+      setSubmitStep(null);
       setIsSubmitting(false);
     }
   };
@@ -115,6 +120,7 @@ export default function CreateListingPage() {
         </label>
 
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
+        {submitStep ? <p className="text-xs text-zinc-500">{submitStep}</p> : null}
 
         <button
           className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"

@@ -251,7 +251,8 @@ export async function uploadListingPhotos(options: {
 
     const uploadResult = await supabase.storage.from(BUCKET).upload(filePath, file, {
       cacheControl: "3600",
-      upsert: false,
+      contentType: file.type || "application/octet-stream",
+      upsert: true,
     });
 
     if (uploadResult.error) {
