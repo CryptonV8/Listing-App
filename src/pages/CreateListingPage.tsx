@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { createListing, deleteListingWithAssets, uploadListingPhotos } from "../lib/listings";
+import { createListing, uploadListingPhotos } from "../lib/listings";
 
 export default function CreateListingPage() {
   const { user } = useAuth();
@@ -32,33 +32,37 @@ export default function CreateListingPage() {
     setError(null);
     setIsSubmitting(true);
 
-    const createResult = await createListing(user.id, {
-      title,
-      description,
-      price: parsedPrice,
-      location,
-    });
+    try {
+      const createResult = await createListing(user.id, {
+        title,
+        description,
+        price: parsedPrice,
+        location,
+      });
 
-    if (!createResult.id || createResult.error) {
-      setError(createResult.error ?? "Офертата не можа да бъде създадена.");
+      if (!createResult.id || createResult.error) {
+        setError(createResult.error ?? "Офертата не можа да бъде създадена.");
+        return;
+      }
+
+      const uploadResult = await uploadListingPhotos({
+        listingId: createResult.id,
+        ownerId: user.id,
+        files,
+      });
+
+      if (uploadResult.error) {
+        setError(`Офертата е създадена, но снимките не можаха да бъдат качени: ${uploadResult.error}`);
+        return;
+      }
+
+      navigate("/my-listings", { replace: true });
+    } catch (caughtError) {
+      const message = caughtError instanceof Error ? caughtError.message : "Публикуването не успя.";
+      setError(message);
+    } finally {
       setIsSubmitting(false);
-      return;
     }
-
-    const uploadResult = await uploadListingPhotos({
-      listingId: createResult.id,
-      ownerId: user.id,
-      files,
-    });
-
-    if (uploadResult.error) {
-      await deleteListingWithAssets(createResult.id, user.id);
-      setError(uploadResult.error);
-      setIsSubmitting(false);
-      return;
-    }
-
-    navigate("/my-listings", { replace: true });
   };
 
   return (
