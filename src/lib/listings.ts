@@ -187,22 +187,19 @@ export async function createListing(ownerId: string, values: ListingFormValues) 
     return { id: null as string | null, error: supabaseConfigErrorMessage };
   }
 
-  const { data, error } = await supabase
-    .from("listings")
-    .insert({
-      owner_id: ownerId,
-      title: values.title,
-      description: values.description,
-      price: values.price,
-      location: values.location,
-    })
-    .select("id");
+  const { data, error } = await supabase.rpc("create_listing", {
+    p_owner_id: ownerId,
+    p_title: values.title,
+    p_description: values.description,
+    p_price: values.price,
+    p_location: values.location,
+  });
 
-  if (error || !data || data.length === 0) {
+  if (error || !data) {
     return { id: null as string | null, error: error?.message ?? "Офертата не можа да бъде създадена." };
   }
 
-  return { id: data[0]?.id ?? null, error: null };
+  return { id: data as string, error: null };
 }
 
 export async function updateListing(listingId: string, ownerId: string, values: ListingFormValues) {
