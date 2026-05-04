@@ -187,19 +187,25 @@ export async function createListing(ownerId: string, values: ListingFormValues) 
     return { id: null as string | null, error: supabaseConfigErrorMessage };
   }
 
-  const { data, error } = await supabase.rpc("create_listing", {
-    p_owner_id: ownerId,
-    p_title: values.title,
-    p_description: values.description,
-    p_price: values.price,
-    p_location: values.location,
-  });
+  // Generate ID client-side to avoid relying on insert return behavior
+  const listingId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
 
-  if (error || !data) {
-    return { id: null as string | null, error: error?.message ?? "Офертата не можа да бъде създадена." };
+  const { error } = await supabase
+    .from("listings")
+    .insert({
+      id: listingId,
+      owner_id: ownerId,
+      title: values.title,
+      description: values.description,
+      price: values.price,
+      location: values.location,
+    });
+
+  if (error) {
+    return { id: null as string | null, error: error.message ?? "Офертата не можа да бъде създадена." };
   }
 
-  return { id: data as string, error: null };
+  return { id: listingId, error: null };
 }
 
 export async function updateListing(listingId: string, ownerId: string, values: ListingFormValues) {
