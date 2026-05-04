@@ -187,7 +187,7 @@ export async function createListing(ownerId: string, values: ListingFormValues) 
     return { id: null as string | null, error: supabaseConfigErrorMessage };
   }
 
-  const { data, error } = await supabase
+  const { error: insertError } = await supabase
     .from("listings")
     .insert({
       owner_id: ownerId,
@@ -195,12 +195,26 @@ export async function createListing(ownerId: string, values: ListingFormValues) 
       description: values.description,
       price: values.price,
       location: values.location,
-    })
-    .select("id")
-    .single();
+    }, { returning: "minimal" });
 
-  if (error || !data) {
-    return { id: null as string | null, error: error?.message ?? "Офертата не можа да бъде създадена." };
+  if (insertError) {
+    return { id: null as string | null, error: insertError.message ?? "Офертата не можа да бъде създадена." };
+  }
+
+  const { data, error: fetchError } = await supabase
+    .from("listings")
+    .select("id")
+    .eq("owner_id", ownerId)
+    .eq("title", values.title)
+    .eq("description", values.description)
+    .eq("price", values.price)
+    .eq("location", values.location)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (fetchError || !data) {
+    return { id: null as string | null, error: fetchError?.message ?? "Офертата е създадена, но не може да бъде прочетена." };
   }
 
   return { id: data.id, error: null };
