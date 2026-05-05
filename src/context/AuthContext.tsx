@@ -3,6 +3,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -46,8 +47,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isRoleLoading, setIsRoleLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const roleLookupIdRef = useRef(0);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadAdminStatus(userId: string | null) {
       if (!userId) {
         setIsAdmin(false);
@@ -56,7 +60,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setIsRoleLoading(true);
+      const currentLookupId = ++roleLookupIdRef.current;
       const { data, error } = await supabase.rpc("is_admin", { check_user_id: userId });
+
+      if (cancelled || currentLookupId !== roleLookupIdRef.current) {
+        return;
+      }
+
       setIsAdmin(!error && Boolean(data));
       setIsRoleLoading(false);
     }
@@ -69,30 +79,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    let mounted = true;
-
-    supabase.auth.getUser().then(async ({ data, error }) => {
-      if (!mounted) {
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) {
         return;
       }
 
-      if (error) {
-        setUser(null);
-        setIsLoading(false);
-        setIsAdmin(false);
-        setIsRoleLoading(false);
-        return;
-      }
-
-      const mappedUser = mapAuthUser(data.user);
+      const mappedUser = mapAuthUser(data.session?.user ?? null);
       setUser(mappedUser);
       setIsLoading(false);
-      await loadAdminStatus(mappedUser?.id ?? null);
+      void loadAdminStatus(mappedUser?.id ?? null);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (cancelled) {
+        return;
+      }
+
       const mappedUser = mapAuthUser(session?.user ?? null);
       setUser(mappedUser);
       setIsLoading(false);
@@ -100,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => {
-      mounted = false;
+      cancelled = true;
       subscription.unsubscribe();
     };
   }, []);
