@@ -233,34 +233,46 @@ export async function createListing(ownerId: string, values: ListingFormValues) 
   const listingId = globalThis.crypto?.randomUUID?.() ?? createUuidFallback();
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
-    const insertResult = await withTimeout(
-      supabase.from("listings").upsert(
-        {
-          id: listingId,
-          owner_id: ownerId,
-          title: values.title,
-          description: values.description,
-          price: values.price,
-          location: values.location,
-        },
-        { onConflict: "id" },
-      ),
-      20_000,
-      "Сървърът не отговаря (timeout) при създаване на офертата. Опитай пак.",
-    );
+    try {
+      const insertResult = await withTimeout(
+        supabase.from("listings").upsert(
+          {
+            id: listingId,
+            owner_id: ownerId,
+            title: values.title,
+            description: values.description,
+            price: values.price,
+            location: values.location,
+          },
+          { onConflict: "id" },
+        ),
+        20_000,
+        "Сървърът не отговаря (timeout) при създаване на офертата. Опитай пак.",
+      );
 
-    const { error } = insertResult;
-    if (!error) {
-      return { id: listingId, error: null };
+      const { error } = insertResult;
+      if (!error) {
+        return { id: listingId, error: null };
+      }
+
+      if (attempt === 0 && isAuthTokenLockError(error.message)) {
+        await delay(300);
+        continue;
+      }
+
+      console.error("createListing insert error:", error);
+      return { id: null as string | null, error: error.message ?? "Офертата не можа да бъде създадена." };
+    } catch (caughtError) {
+      const message = normalizeError(caughtError, "Офертата не можа да бъде създадена.");
+
+      if (attempt === 0 && isAuthTokenLockError(message)) {
+        await delay(300);
+        continue;
+      }
+
+      console.error("createListing unexpected error:", caughtError);
+      return { id: null as string | null, error: message };
     }
-
-    if (attempt === 0 && isAuthTokenLockError(error.message)) {
-      await delay(300);
-      continue;
-    }
-
-    console.error("createListing insert error:", error);
-    return { id: null as string | null, error: error.message ?? "Офертата не можа да бъде създадена." };
   }
 
   return { id: null as string | null, error: "Офертата не можа да бъде създадена." };
