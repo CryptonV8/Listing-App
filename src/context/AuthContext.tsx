@@ -48,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isRoleLoading, setIsRoleLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const roleLookupIdRef = useRef(0);
+  const roleUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -79,17 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) {
-        return;
-      }
-
-      const mappedUser = mapAuthUser(data.session?.user ?? null);
-      setUser(mappedUser);
-      setIsLoading(false);
-      void loadAdminStatus(mappedUser?.id ?? null);
-    });
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -100,7 +90,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const mappedUser = mapAuthUser(session?.user ?? null);
       setUser(mappedUser);
       setIsLoading(false);
-      await loadAdminStatus(mappedUser?.id ?? null);
+
+      const nextUserId = mappedUser?.id ?? null;
+      if (roleUserIdRef.current !== nextUserId) {
+        roleUserIdRef.current = nextUserId;
+        void loadAdminStatus(nextUserId);
+      }
     });
 
     return () => {

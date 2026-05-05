@@ -70,6 +70,25 @@ function normalizeError(error: unknown, fallbackMessage: string) {
   return fallbackMessage;
 }
 
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject(new Error(timeoutMessage));
+    }, timeoutMs);
+
+    promise.then(
+      (value) => {
+        clearTimeout(timeoutId);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timeoutId);
+        reject(error);
+      },
+    );
+  });
+}
+
 function sanitizeFileName(fileName: string) {
   return fileName.toLowerCase().replace(/[^a-z0-9.-]/g, "-");
 }
@@ -197,16 +216,20 @@ export async function createListing(ownerId: string, values: ListingFormValues) 
 
   const listingId = globalThis.crypto?.randomUUID?.() ?? createUuidFallback();
 
-  const { error } = await supabase
-    .from("listings")
-    .insert({
+  const insertResult = await withTimeout(
+    supabase.from("listings").insert({
       id: listingId,
       owner_id: ownerId,
       title: values.title,
       description: values.description,
       price: values.price,
       location: values.location,
-    });
+    }),
+    20_000,
+    "Сървърът не отговаря (timeout) при създаване на офертата. Опитай пак.",
+  );
+
+  const { error } = insertResult;
 
   if (error) {
     console.error("createListing insert error:", error);
@@ -259,11 +282,15 @@ export async function uploadListingPhotos(options: {
     const file = options.files[index];
     const filePath = `${options.ownerId}/${options.listingId}/${Date.now()}-${index}-${sanitizeFileName(file.name)}`;
 
-    const uploadResult = await supabase.storage.from(BUCKET).upload(filePath, file, {
-      cacheControl: "3600",
-      contentType: file.type || "application/octet-stream",
-      upsert: true,
-    });
+    const uploadResult = await withTimeout(
+      supabase.storage.from(BUCKET).upload(filePath, file, {
+        cacheControl: "3600",
+        contentType: file.type || "application/octet-stream",
+        upsert: true,
+      }),
+      60_000,
+      "Сървърът не отговаря (timeout) при качване на снимките. Опитай пак.",
+    );
 
     if (uploadResult.error) {
       console.error("uploadListingPhotos storage error:", uploadResult.error);
@@ -277,10 +304,16 @@ export async function uploadListingPhotos(options: {
     });
   }
 
-  const { data, error } = await supabase
-    .from("listing_photos")
-    .insert(uploadedRows)
-    .select("id, storage_path, display_order, created_at");
+  const insertPhotosResult = await withTimeout(
+    supabase
+      .from("listing_photos")
+      .insert(uploadedRows)
+      .select("id, storage_path, display_order, created_at"),
+    20_000,
+    "Сървърът не отговаря (timeout) при запис на снимките към офертата. Опитай пак.",
+  );
+
+  const { data, error } = insertPhotosResult;
 
   if (error) {
     console.error("uploadListingPhotos db error:", error);
