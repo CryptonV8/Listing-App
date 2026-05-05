@@ -16,11 +16,14 @@ export default function CreateListingPage() {
   const [submitStep, setSubmitStep] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handlePublish = async () => {
     if (!user) {
       setError("Трябва да си влязъл в профила си.");
+      return;
+    }
+
+    if (!title.trim() || !description.trim() || !location.trim()) {
+      setError("Всички полета са задължителни.");
       return;
     }
 
@@ -75,7 +78,13 @@ export default function CreateListingPage() {
       <h1 className="text-2xl font-semibold tracking-tight">Нова оферта</h1>
       <p className="text-sm text-zinc-600">Публикувай нова оферта и качи основни и допълнителни снимки.</p>
 
-      <form className="space-y-3 rounded border border-zinc-200 bg-white p-4" onSubmit={handleSubmit}>
+      <form
+        className="space-y-3 rounded border border-zinc-200 bg-white p-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void handlePublish();
+        }}
+      >
         <input
           className="w-full rounded border border-zinc-300 px-3 py-2"
           placeholder="Заглавие"
@@ -124,7 +133,10 @@ export default function CreateListingPage() {
 
         <button
           className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
-          type="submit"
+          type="button"
+          onClick={() => {
+            void handlePublish();
+          }}
           disabled={isSubmitting}
         >
           {isSubmitting ? "Записване на офертата..." : "Публикувай офертата"}
