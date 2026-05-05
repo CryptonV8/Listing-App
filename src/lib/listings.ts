@@ -74,6 +74,14 @@ function sanitizeFileName(fileName: string) {
   return fileName.toLowerCase().replace(/[^a-z0-9.-]/g, "-");
 }
 
+function createUuidFallback() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (character) => {
+    const randomValue = (Math.random() * 16) | 0;
+    const uuidValue = character === "x" ? randomValue : (randomValue & 0x3) | 0x8;
+    return uuidValue.toString(16);
+  });
+}
+
 export async function fetchListingsPage(options: {
   page: number;
   pageSize: number;
@@ -187,8 +195,7 @@ export async function createListing(ownerId: string, values: ListingFormValues) 
     return { id: null as string | null, error: supabaseConfigErrorMessage };
   }
 
-  // Generate ID client-side to avoid relying on insert return behavior
-  const listingId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+  const listingId = globalThis.crypto?.randomUUID?.() ?? createUuidFallback();
 
   const { error } = await supabase
     .from("listings")
@@ -202,6 +209,7 @@ export async function createListing(ownerId: string, values: ListingFormValues) 
     });
 
   if (error) {
+    console.error("createListing insert error:", error);
     return { id: null as string | null, error: error.message ?? "Офертата не можа да бъде създадена." };
   }
 
@@ -258,6 +266,7 @@ export async function uploadListingPhotos(options: {
     });
 
     if (uploadResult.error) {
+      console.error("uploadListingPhotos storage error:", uploadResult.error);
       return { error: uploadResult.error.message, photos: [] as ListingPhoto[] };
     }
 
@@ -274,6 +283,7 @@ export async function uploadListingPhotos(options: {
     .select("id, storage_path, display_order, created_at");
 
   if (error) {
+    console.error("uploadListingPhotos db error:", error);
     return { error: error.message, photos: [] as ListingPhoto[] };
   }
 
