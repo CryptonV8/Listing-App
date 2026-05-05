@@ -93,6 +93,22 @@ function sanitizeFileName(fileName: string) {
   return fileName.toLowerCase().replace(/[^a-z0-9.-]/g, "-");
 }
 
+function isAuthTokenLockError(message: string | undefined) {
+  if (!message) {
+    return false;
+  }
+
+  return message.includes("auth-token") && message.includes("lock:sb-") && message.includes("stole");
+}
+
+function delay(timeoutMs: number) {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, timeoutMs);
+  });
+}
+
 function createUuidFallback() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (character) => {
     const randomValue = (Math.random() * 16) | 0;
@@ -216,27 +232,38 @@ export async function createListing(ownerId: string, values: ListingFormValues) 
 
   const listingId = globalThis.crypto?.randomUUID?.() ?? createUuidFallback();
 
-  const insertResult = await withTimeout(
-    supabase.from("listings").insert({
-      id: listingId,
-      owner_id: ownerId,
-      title: values.title,
-      description: values.description,
-      price: values.price,
-      location: values.location,
-    }),
-    20_000,
-    "Сървърът не отговаря (timeout) при създаване на офертата. Опитай пак.",
-  );
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const insertResult = await withTimeout(
+      supabase.from("listings").upsert(
+        {
+          id: listingId,
+          owner_id: ownerId,
+          title: values.title,
+          description: values.description,
+          price: values.price,
+          location: values.location,
+        },
+        { onConflict: "id" },
+      ),
+      20_000,
+      "Сървърът не отговаря (timeout) при създаване на офертата. Опитай пак.",
+    );
 
-  const { error } = insertResult;
+    const { error } = insertResult;
+    if (!error) {
+      return { id: listingId, error: null };
+    }
 
-  if (error) {
+    if (attempt === 0 && isAuthTokenLockError(error.message)) {
+      await delay(300);
+      continue;
+    }
+
     console.error("createListing insert error:", error);
     return { id: null as string | null, error: error.message ?? "Офертата не можа да бъде създадена." };
   }
 
-  return { id: listingId, error: null };
+  return { id: null as string | null, error: "Офертата не можа да бъде създадена." };
 }
 
 export async function updateListing(listingId: string, ownerId: string, values: ListingFormValues) {
